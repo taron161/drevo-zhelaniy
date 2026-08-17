@@ -13,21 +13,17 @@ export default async function ProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    include: {
-      waters: {
-        orderBy: { createdAt: 'desc' },
-        take: 10,
-      },
-      donations: {
-        orderBy: { createdAt: 'desc' },
-        take: 10,
-      },
-    },
   });
 
   if (!user) {
     redirect('/auth');
   }
+
+  const waters = await prisma.water.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  });
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-green-50 to-green-100">
@@ -54,7 +50,6 @@ export default async function ProfilePage() {
         </header>
 
         <div className="max-w-2xl mx-auto">
-          {/* Профиль */}
           <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4 mb-4">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center text-2xl sm:text-3xl">
@@ -78,25 +73,24 @@ export default async function ProfilePage() {
               <div className="bg-blue-50 p-3 sm:p-4 rounded">
                 <p className="text-xs sm:text-sm text-gray-500">Поливов</p>
                 <p className="text-lg sm:text-xl font-bold text-blue-600">
-                  {user.waters.length} 🌊
+                  {waters.length} 🌊
                 </p>
               </div>
             </div>
           </div>
 
-          {/* История поливов */}
           <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
             <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
               Последние поливы
             </h3>
             
-            {user.waters.length === 0 ? (
+            {waters.length === 0 ? (
               <p className="text-sm sm:text-base text-gray-400 text-center py-4">
                 Пока нет поливов
               </p>
             ) : (
               <div className="space-y-2 sm:space-y-3">
-                {user.waters.map((water) => (
+                {waters.map((water) => (
                   <div 
                     key={water.id}
                     className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded"
