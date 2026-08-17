@@ -20,7 +20,6 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        // Вход
         const result = await signIn('credentials', {
           email,
           password,
@@ -34,7 +33,6 @@ export default function AuthPage() {
           router.refresh();
         }
       } else {
-        // Регистрация
         const response = await fetch('/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -42,7 +40,6 @@ export default function AuthPage() {
         });
 
         if (response.ok) {
-          // После успешной регистрации сразу входим
           const result = await signIn('credentials', {
             email,
             password,
@@ -68,27 +65,29 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-green-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center mb-6 text-green-800">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-green-100 px-4">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-[95%] sm:max-w-md animate-fade-in">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 text-green-800">
           {isLogin ? '🌳 Вход' : '🌱 Регистрация'}
         </h2>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <div className="bg-red-100 text-red-700 p-2 sm:p-3 rounded mb-4 text-sm sm:text-base">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-gray-700 mb-2">Имя</label>
+              <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
+                Имя
+              </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-2 sm:p-3 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                 required
                 placeholder="Ваше имя"
               />
@@ -96,24 +95,28 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label className="block text-gray-700 mb-2">Email</label>
+            <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
+              Email
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-2 sm:p-3 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
               required
               placeholder="your@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-2">Пароль</label>
+            <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
+              Пароль
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-2 sm:p-3 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
               required
               placeholder="Минимум 6 символов"
             />
@@ -122,7 +125,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-green-600 text-white py-2 sm:py-3 rounded text-sm sm:text-base hover:bg-green-700 disabled:opacity-50 transition-colors"
           >
             {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
           </button>
@@ -133,7 +136,7 @@ export default function AuthPage() {
             setIsLogin(!isLogin);
             setError('');
           }}
-          className="w-full text-center mt-4 text-green-600 hover:text-green-700"
+          className="w-full text-center mt-3 sm:mt-4 text-green-600 hover:text-green-700 text-sm sm:text-base"
         >
           {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
         </button>

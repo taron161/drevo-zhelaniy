@@ -47,3 +47,30 @@ body {
 .animate-drop {
   animation: drop 1s ease-in infinite;
 }
+
+/* Анимация появления */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Улучшение для мобильных */
+@media (max-width: 640px) {
+  .text-8xl {
+    font-size: 4rem;
+  }
+  
+  .text-4xl {
+    font-size: 1.75rem;
+  }
+}
