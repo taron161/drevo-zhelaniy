@@ -3,6 +3,29 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export async function GET() {
+  try {
+    const treeState = await prisma.treeState.findFirst({
+      orderBy: { updatedAt: 'desc' },
+    });
+    
+    return NextResponse.json({
+      waterLevel: treeState?.waterLevel || 0,
+      growthStage: treeState?.growthStage || 1,
+    });
+  } catch (error) {
+    console.error('Ошибка получения состояния дерева:', error);
+    return NextResponse.json(
+      { 
+        waterLevel: 0,
+        growthStage: 1,
+        error: 'Ошибка сервера' 
+      },
+      { status: 200 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -34,7 +57,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const [updatedUser, waterRecord] = await prisma.$transaction([
+    const [updatedUser] = await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },
         data: { balance: { decrement: amount } },
@@ -48,7 +71,9 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    let treeState = await prisma.treeState.findFirst();
+    let treeState = await prisma.treeState.findFirst({
+      orderBy: { updatedAt: 'desc' },
+    });
     
     const newWaterLevel = Math.min(100, (treeState?.waterLevel || 0) + amount);
     const newGrowthStage = Math.min(5, Math.floor(newWaterLevel / 20) + 1);
@@ -78,23 +103,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Ошибка полива:', error);
-    return NextResponse.json(
-      { error: 'Ошибка сервера' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const treeState = await prisma.treeState.findFirst();
-    
-    return NextResponse.json({
-      waterLevel: treeState?.waterLevel || 0,
-      growthStage: treeState?.growthStage || 1,
-    });
-  } catch (error) {
-    console.error('Ошибка получения состояния дерева:', error);
     return NextResponse.json(
       { error: 'Ошибка сервера' },
       { status: 500 }

@@ -22,7 +22,7 @@ export const authOptions = {
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: email },
+          where: { email },
         })
 
         if (!user) {
@@ -48,11 +48,12 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt" as const,
+    maxAge: 30 * 24 * 60 * 60, // 30 дней
   },
   pages: {
     signIn: "/auth",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6",
 }
 
 export default authOptions

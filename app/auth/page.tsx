@@ -13,52 +13,59 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const result = await signIn('credentials', {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Успешная регистрация - сразу входим
+        await signIn('credentials', {
           email,
           password,
           redirect: false,
         });
-
-        if (result?.error) {
-          setError('Неверный email или пароль');
-        } else {
-          router.push('/');
-          router.refresh();
-        }
+        router.push('/');
+        router.refresh();
       } else {
-        const response = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, name }),
-        });
-
-        if (response.ok) {
-          const result = await signIn('credentials', {
-            email,
-            password,
-            redirect: false,
-          });
-
-          if (result?.error) {
-            setError('Ошибка входа после регистрации');
-          } else {
-            router.push('/');
-            router.refresh();
-          }
-        } else {
-          const data = await response.json();
-          setError(data.error || 'Ошибка регистрации');
-        }
+        setError(data.error || 'Ошибка регистрации');
       }
     } catch (err) {
-      setError('Произошла ошибка. Попробуйте еще раз.');
+      setError('Произошла ошибка');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Неверный email или пароль');
+      } else {
+        router.push('/');
+        router.refresh();
+      }
+    } catch (err) {
+      setError('Произошла ошибка');
     } finally {
       setLoading(false);
     }
@@ -66,7 +73,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-green-100 px-4">
-      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-[95%] sm:max-w-md animate-fade-in">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-[95%] sm:max-w-md">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 text-green-800">
           {isLogin ? '🌳 Вход' : '🌱 Регистрация'}
         </h2>
@@ -77,7 +84,7 @@ export default function AuthPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <form onSubmit={isLogin ? handleLogin : handleRegister} className="space-y-3 sm:space-y-4">
           {!isLogin && (
             <div>
               <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
@@ -88,8 +95,7 @@ export default function AuthPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full p-2 sm:p-3 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
-                required
-                placeholder="Ваше имя"
+                placeholder="Ваше имя (необязательно)"
               />
             </div>
           )}

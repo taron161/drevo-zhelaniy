@@ -3,13 +3,20 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
+  console.log('Начало регистрации');
+  
   try {
-    const { email, password, name } = await request.json();
+    const body = await request.json();
+    console.log('Получены данные:', body);
+    
+    const { email, password, name } = body;
 
-    // Проверяем, существует ли пользователь
+    // Проверяем существование
+    console.log('Проверяем пользователя...');
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
+    console.log('Существующий пользователь:', existingUser);
 
     if (existingUser) {
       return NextResponse.json(
@@ -19,17 +26,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Хешируем пароль
+    console.log('Хешируем пароль...');
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Создаем пользователя с начальным балансом
+    // Создаем пользователя
+    console.log('Создаем пользователя...');
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        name,
-        balance: 100, // Начальный баланс для тестирования
+        name: name || email.split('@')[0],
+        balance: 100,
       },
     });
+    console.log('Пользователь создан:', user);
 
     return NextResponse.json({
       success: true,
@@ -41,9 +51,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Ошибка регистрации:', error);
+    console.error('ОШИБКА РЕГИСТРАЦИИ:', error);
     return NextResponse.json(
-      { error: 'Ошибка сервера' },
+      { error: 'Ошибка сервера: ' + (error as Error).message },
       { status: 500 }
     );
   }
