@@ -16,9 +16,12 @@ export default async function Home() {
           
           {session ? (
             <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-              <p className="hidden sm:block text-sm text-gray-600">
-                {session.user?.name || session.user?.email}
-              </p>
+              <Link 
+                href="/profile"
+                className="text-green-600 hover:text-green-700 text-xs sm:text-sm whitespace-nowrap"
+              >
+                Профиль
+              </Link>
               <Link 
                 href="/api/auth/signout"
                 className="bg-red-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm hover:bg-red-600 transition-colors whitespace-nowrap"
