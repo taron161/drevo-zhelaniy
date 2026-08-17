@@ -1,5 +1,4 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "buildCommand": "prisma generate && prisma db push && next build"
 }
