@@ -50,7 +50,7 @@ export default function Tree() {
       if (response.ok) {
         setWaterLevel(data.waterLevel);
         setGrowthStage(data.growthStage);
-        setMessage(`Дерево полито! 💧`);
+        setMessage(`Дерево растет! 💧`);
         
         setTimeout(() => setMessage(''), 3000);
       } else {
@@ -99,7 +99,7 @@ export default function Tree() {
           <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4">
             <div 
               className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 sm:h-4 rounded-full transition-all duration-500"
-              style={{ width: `${waterLevel}%` }}
+              style={{ width: `${Math.min(100, waterLevel)}%` }}
             />
           </div>
         </div>

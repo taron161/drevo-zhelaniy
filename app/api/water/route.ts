@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
     });
     
-    const newWaterLevel = Math.min(100, (treeState?.waterLevel || 0) + amount);
+    const newWaterLevel = (treeState?.waterLevel || 0) + amount;
     const newGrowthStage = Math.min(5, Math.floor(newWaterLevel / 20) + 1);
 
     if (treeState) {
