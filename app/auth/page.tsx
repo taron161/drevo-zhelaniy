@@ -28,7 +28,6 @@ export default function AuthPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Успешная регистрация - сразу входим
         await signIn('credentials', {
           email,
           password,
@@ -74,12 +73,12 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-green-100 px-4">
       <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-[95%] sm:max-w-md">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 text-green-800">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 text-green-800 select-none">
           {isLogin ? '🌳 Вход' : '🌱 Регистрация'}
         </h2>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-2 sm:p-3 rounded mb-4 text-sm sm:text-base">
+          <div className="bg-red-100 text-red-700 p-2 sm:p-3 rounded mb-4 text-sm sm:text-base select-none">
             {error}
           </div>
         )}
@@ -87,7 +86,7 @@ export default function AuthPage() {
         <form onSubmit={isLogin ? handleLogin : handleRegister} className="space-y-3 sm:space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
+              <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base select-none">
                 Имя
               </label>
               <input
@@ -101,7 +100,7 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
+            <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base select-none">
               Email
             </label>
             <input
@@ -115,7 +114,7 @@ export default function AuthPage() {
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
+            <label className="block text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base select-none">
               Пароль
             </label>
             <input
@@ -131,7 +130,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-2 sm:py-3 rounded text-sm sm:text-base hover:bg-green-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-green-600 text-white py-2 sm:py-3 rounded text-sm sm:text-base hover:bg-green-700 disabled:opacity-50 transition-colors select-none"
           >
             {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
           </button>
@@ -142,7 +141,7 @@ export default function AuthPage() {
             setIsLogin(!isLogin);
             setError('');
           }}
-          className="w-full text-center mt-3 sm:mt-4 text-green-600 hover:text-green-700 text-sm sm:text-base"
+          className="w-full text-center mt-3 sm:mt-4 text-green-600 hover:text-green-700 text-sm sm:text-base select-none"
         >
           {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
         </button>
