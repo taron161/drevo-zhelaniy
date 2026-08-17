@@ -3,29 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
-  try {
-    const treeState = await prisma.treeState.findFirst({
-      orderBy: { updatedAt: 'desc' },
-    });
-    
-    return NextResponse.json({
-      waterLevel: treeState?.waterLevel || 0,
-      growthStage: treeState?.growthStage || 1,
-    });
-  } catch (error) {
-    console.error('Ошибка получения состояния дерева:', error);
-    return NextResponse.json(
-      { 
-        waterLevel: 0,
-        growthStage: 1,
-        error: 'Ошибка сервера' 
-      },
-      { status: 200 }
-    );
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -50,27 +27,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.balance < amount) {
-      return NextResponse.json(
-        { error: 'Недостаточно средств' },
-        { status: 400 }
-      );
-    }
+    // Создаем запись о поливе
+    await prisma.water.create({
+      data: {
+        amount,
+        message,
+        userId: user.id,
+      },
+    });
 
-    const [updatedUser] = await prisma.$transaction([
-      prisma.user.update({
-        where: { id: user.id },
-        data: { balance: { decrement: amount } },
-      }),
-      prisma.water.create({
-        data: {
-          amount,
-          message,
-          userId: user.id,
-        },
-      }),
-    ]);
-
+    // Обновляем состояние дерева
     let treeState = await prisma.treeState.findFirst({
       orderBy: { updatedAt: 'desc' },
     });
@@ -97,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      balance: updatedUser.balance,
+      balance: user.balance,
       waterLevel: treeState.waterLevel,
       growthStage: treeState.growthStage,
     });
@@ -106,6 +72,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Ошибка сервера' },
       { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    const treeState = await prisma.treeState.findFirst({
+      orderBy: { updatedAt: 'desc' },
+    });
+    
+    return NextResponse.json({
+      waterLevel: treeState?.waterLevel || 0,
+      growthStage: treeState?.growthStage || 1,
+    });
+  } catch (error) {
+    console.error('Ошибка получения состояния дерева:', error);
+    return NextResponse.json(
+      { 
+        waterLevel: 0,
+        growthStage: 1,
+      },
+      { status: 200 }
     );
   }
 }

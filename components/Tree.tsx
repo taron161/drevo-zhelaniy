@@ -50,7 +50,7 @@ export default function Tree() {
       if (response.ok) {
         setWaterLevel(data.waterLevel);
         setGrowthStage(data.growthStage);
-        setMessage(`Дерево полито! Осталось ${data.balance} 💧`);
+        setMessage(`Дерево полито! 💧`);
         
         setTimeout(() => setMessage(''), 3000);
       } else {
