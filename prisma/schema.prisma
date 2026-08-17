@@ -1,9 +1,43 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  donations Donation[]
+  waters    Water[]
+}
+
+model Donation {
+  id        String   @id @default(cuid())
+  amount    Float
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Water {
+  id        String   @id @default(cuid())
+  amount    Float
+  message   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model TreeState {
+  id          String   @id @default(cuid())
+  waterLevel  Float    @default(0)
+  growthStage Int      @default(1)
+  updatedAt   DateTime @updatedAt
 }
