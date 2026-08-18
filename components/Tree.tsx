@@ -1,20 +1,158 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Tree() {
   const [waterLevel, setWaterLevel] = useState(0);
   const [growthStage, setGrowthStage] = useState(1);
   const [isWatering, setIsWatering] = useState(false);
   const [message, setMessage] = useState('');
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const treeStages = [
-    { emoji: '🌱', name: 'Семя' },
-    { emoji: '🌿', name: 'Росток' },
-    { emoji: '🪴', name: 'Растение' },
-    { emoji: '🌳', name: 'Дерево' },
-    { emoji: '🌲', name: 'Могучее дерево' },
+    { name: 'Семя', height: 30 },
+    { name: 'Росток', height: 60 },
+    { name: 'Растение', height: 90 },
+    { name: 'Дерево', height: 120 },
+    { name: 'Могучее дерево', height: 150 },
   ];
+
+  const drawTree = (stage: number, water: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Очищаем canvas
+    ctx.clearRect(0, 0, width, height);
+
+    // Горшок
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.moveTo(width / 2 - 40, height - 60);
+    ctx.lineTo(width / 2 + 40, height - 60);
+    ctx.lineTo(width / 2 + 30, height - 10);
+    ctx.lineTo(width / 2 - 30, height - 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Ободок горшка
+    ctx.fillStyle = '#b45309';
+    ctx.fillRect(width / 2 - 45, height - 65, 90, 10);
+
+    const baseX = width / 2;
+    const baseY = height - 70;
+
+    if (stage === 1) {
+      // Семя - просто точка в земле
+      ctx.fillStyle = '#8B4513';
+      ctx.beginPath();
+      ctx.ellipse(baseX, baseY - 5, 8, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (stage === 2) {
+      // Росток - маленький стебель
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY);
+      ctx.quadraticCurveTo(baseX, baseY - 30, baseX, baseY - 50);
+      ctx.stroke();
+
+      // Листики
+      ctx.fillStyle = '#4ade80';
+      ctx.beginPath();
+      ctx.ellipse(baseX - 10, baseY - 35, 10, 5, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(baseX + 10, baseY - 25, 10, 5, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (stage === 3) {
+      // Растение - толще стебель
+      ctx.strokeStyle = '#16a34a';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY);
+      ctx.quadraticCurveTo(baseX - 5, baseY - 40, baseX, baseY - 80);
+      ctx.stroke();
+
+      // Ветки
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY - 50);
+      ctx.quadraticCurveTo(baseX - 20, baseY - 60, baseX - 30, baseY - 70);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY - 40);
+      ctx.quadraticCurveTo(baseX + 20, baseY - 50, baseX + 25, baseY - 60);
+      ctx.stroke();
+
+      // Листья
+      ctx.fillStyle = '#4ade80';
+      ctx.beginPath();
+      ctx.arc(baseX - 30, baseY - 75, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX + 25, baseY - 65, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX, baseY - 85, 12, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (stage === 4) {
+      // Дерево - ствол и крона
+      ctx.fillStyle = '#8B4513';
+      ctx.fillRect(baseX - 8, baseY - 100, 16, 100);
+
+      // Крона
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(baseX, baseY - 110, 40, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX - 30, baseY - 90, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX + 30, baseY - 90, 30, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Могучее дерево - большой ствол и крона
+      ctx.fillStyle = '#654321';
+      ctx.fillRect(baseX - 12, baseY - 130, 24, 130);
+
+      // Большая крона
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath();
+      ctx.arc(baseX, baseY - 140, 55, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX - 40, baseY - 115, 40, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX + 40, baseY - 115, 40, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX - 20, baseY - 155, 35, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(baseX + 20, baseY - 155, 35, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Капли воды
+    if (isWatering) {
+      ctx.fillStyle = '#3b82f6';
+      for (let i = 0; i < 5; i++) {
+        const x = baseX + Math.random() * 40 - 20;
+        const y = baseY - 100 - Math.random() * 50;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 3, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchTreeState = async () => {
@@ -32,6 +170,10 @@ export default function Tree() {
 
     fetchTreeState();
   }, []);
+
+  useEffect(() => {
+    drawTree(growthStage, waterLevel);
+  }, [growthStage, waterLevel, isWatering]);
 
   const handleWater = async (amount: number) => {
     if (isWatering) return;
@@ -60,21 +202,20 @@ export default function Tree() {
       console.error('Ошибка полива:', error);
       setMessage('Произошла ошибка');
     } finally {
-      setIsWatering(false);
+      setTimeout(() => setIsWatering(false), 1000);
     }
   };
 
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-8">
-      {/* Дерево в горшке */}
-      <div className="flex flex-col items-center">
-        <div className="text-6xl sm:text-8xl md:text-9xl animate-bounce-slow transition-all duration-500 select-none">
-          {treeStages[growthStage - 1].emoji}
-        </div>
-        {/* Горшок */}
-        <div className="w-20 h-16 sm:w-28 sm:h-20 bg-gradient-to-b from-orange-400 to-orange-600 rounded-b-2xl rounded-t-sm mt-1 shadow-lg relative">
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 sm:w-32 h-3 bg-orange-500 rounded-t-lg" />
-        </div>
+      {/* Canvas с деревом */}
+      <div className="bg-gradient-to-b from-sky-100 to-green-50 rounded-lg shadow-lg p-4 sm:p-6">
+        <canvas
+          ref={canvasRef}
+          width={300}
+          height={250}
+          className="w-full max-w-[300px] h-auto"
+        />
       </div>
 
       {/* Название стадии */}
